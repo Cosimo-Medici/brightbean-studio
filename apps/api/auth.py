@@ -122,7 +122,13 @@ class ApiKeyAuth(HttpBearer):
         # the attempt toward the IP throttle so plain-HTTP brute-forcing
         # is also rate-limited (the previous behaviour leaked free 400s
         # forever, undercutting the throttle).
-        if not request.is_secure() and not settings.DEBUG:
+        # The Cosimo local Compose installation binds only 127.0.0.1. Permit
+        # its local API without enabling Django debug pages or trusting an
+        # arbitrary X-Forwarded-Proto header. Production never sets this flag.
+        local_api = getattr(settings, "COSIMO_LOOPBACK_API", False) and request.get_host().split(":")[0] in {
+            "localhost", "127.0.0.1"
+        }
+        if not request.is_secure() and not settings.DEBUG and not local_api:
             # WARNING: in prod, SecurityMiddleware's SSL redirect means real
             # plain-HTTP traffic never reaches here, so a False is_secure()
             # signals a misconfigured proxy (missing X-Forwarded-Proto) worth

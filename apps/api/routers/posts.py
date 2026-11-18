@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import uuid
 
+from django.db import transaction
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from ninja import Router
@@ -229,51 +230,43 @@ def create(request, payload: CreatePostRequest):
             release_idempotent_claim(api_key=request.api_key, idempotency_key=idempotency_key)
             raise
 
-    # Single try/except covers every step from create_post through
-    # finalize_idempotent_response. Codex review found that earlier
-    # code committed the Post + PlatformPost via create_post and then
-    # built the response / wrote the audit / called finalize OUTSIDE
-    # the release path — so a transient DB error during response build
-    # or finalize left the idempotency slot wedged in PENDING forever
-    # while the work had already succeeded. Folding everything under
-    # one ``try / except / release`` closes that window: any exception
-    # after the claim releases the slot, the agent can retry, and the
-    # retry will reach create_post fresh (or replay if finalize did
-    # commit before the failure).
+    # Commit the post and its replay response together. If finalization fails,
+    # rolling back creation before releasing the claim makes retries safe.
     try:
-        post = create_post(
-            workspace=request.api_key.workspace,
-            social_account=social_account,
-            caption=payload.caption,
-            media_asset_ids=payload.media_asset_ids,
-            title=payload.title,
-            first_comment=payload.first_comment,
-            internal_notes=payload.internal_notes,
-            scheduled_at=payload.scheduled_at,
-            # A scheduled post carries a real time, not a proposal — ignore any
-            # proposed_publish_at when scheduling so the two never coexist.
-            proposed_publish_at=None if payload.action == "schedule" else payload.proposed_publish_at,
-            author=request.user if not request.user.is_anonymous else None,
-            status="scheduled" if payload.action == "schedule" else "draft",
-            platform_overrides=platform_overrides,
-        )
-        body = _post_to_response(request, post)
-        status_code = 201
-        log_audit_entry(
-            request,
-            action=f"post.create.{payload.action}",
-            target_id=post.id,
-            status_code=status_code,
-        )
-        # ``model_dump(mode='json')`` yields JSON-safe primitives
-        # (UUID→str, datetime→ISO-8601 str) so the response_body
-        # JSONField round-trips cleanly through psycopg's jsonb adapter.
-        finalize_idempotent_response(
-            api_key=request.api_key,
-            idempotency_key=idempotency_key,
-            status_code=status_code,
-            body=body.model_dump(mode="json"),
-        )
+        with transaction.atomic():
+            post = create_post(
+                workspace=request.api_key.workspace,
+                social_account=social_account,
+                caption=payload.caption,
+                media_asset_ids=payload.media_asset_ids,
+                title=payload.title,
+                first_comment=payload.first_comment,
+                internal_notes=payload.internal_notes,
+                scheduled_at=payload.scheduled_at,
+                # A scheduled post carries a real time, not a proposal — ignore any
+                # proposed_publish_at when scheduling so the two never coexist.
+                proposed_publish_at=None if payload.action == "schedule" else payload.proposed_publish_at,
+                author=request.user if not request.user.is_anonymous else None,
+                status="scheduled" if payload.action == "schedule" else "draft",
+                platform_overrides=platform_overrides,
+            )
+            body = _post_to_response(request, post)
+            status_code = 201
+            log_audit_entry(
+                request,
+                action=f"post.create.{payload.action}",
+                target_id=post.id,
+                status_code=status_code,
+            )
+            # ``model_dump(mode='json')`` yields JSON-safe primitives
+            # (UUID→str, datetime→ISO-8601 str) so the response_body
+            # JSONField round-trips cleanly through psycopg's jsonb adapter.
+            finalize_idempotent_response(
+                api_key=request.api_key,
+                idempotency_key=idempotency_key,
+                status_code=status_code,
+                body=body.model_dump(mode="json"),
+            )
     except ValueError as exc:
         # Use the *effective* idempotency key (header fallback applied)
         # so a header-only client's claim is released too — Codex PR #53

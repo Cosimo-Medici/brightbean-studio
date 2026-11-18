@@ -1,0 +1,57 @@
+name: cosimo-publishing
+
+x-app: &app
+  image: cosimo/brightbean:14b92fc-cosimo
+  build:
+    context: ..
+  env_file:
+    - ./private/runtime.env
+  volumes:
+    - media:/app/media
+  restart: unless-stopped
+
+services:
+  database:
+    image: postgres:16-alpine
+    env_file:
+      - ./private/database.env
+    volumes:
+      - database:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U brightbean -d brightbean"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  migrate:
+    <<: *app
+    command: python manage.py migrate --noinput
+    restart: "no"
+    depends_on:
+      database:
+        condition: service_healthy
+
+  web:
+    <<: *app
+    ports:
+      - "127.0.0.1:4010:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  worker:
+    <<: *app
+    command: python manage.py run_studio_worker
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  database:
+  media:

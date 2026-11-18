@@ -1,0 +1,14 @@
+.git
+.env
+.env.*
+!.env.example
+.venv
+venv
+**/__pycache__
+**/node_modules
+media
+staticfiles
+*.sqlite3
+output
+cosimo/private
+cosimo/backups
