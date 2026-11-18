@@ -5,12 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accept Terms - Brightbean</title>
-    <link rel="icon" href="{% static 'favicon/favicon.ico' %}" sizes="any">
-    <link rel="icon" type="image/svg+xml" href="{% static 'favicon/favicon.svg' %}">
-    <link rel="icon" type="image/png" sizes="96x96" href="{% static 'favicon/favicon-96x96.png' %}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicon/apple-touch-icon.png' %}">
-    <link rel="manifest" href="{% static 'favicon/site.webmanifest' %}">
+    <link rel="icon" type="image/svg+xml" href="{% static 'cosimo/mark.svg' %}">
     <link rel="stylesheet" href="{% static 'css/dist/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'cosimo/publishing.css' %}">
 </head>
 <body>
 <main class="auth-bg min-h-screen flex items-center justify-center py-12 px-4" style="font-family: var(--font-body);">
@@ -18,13 +15,13 @@
         <!-- Logo & Header -->
         <div class="text-center mb-8">
             <div class="inline-flex items-center justify-center w-12 h-12 mb-4">
-                <img src="{% static 'img/brightbean-studio-logo.webp' %}" alt="Brightbean logo" class="w-12 h-12 object-contain">
+                <img src="{% static 'cosimo/mark.svg' %}" alt="Cosimo logo" class="w-12 h-12 object-contain">
             </div>
             <h1 class="text-2xl font-bold tracking-tight" style="color: var(--text-primary);">
                 Almost there
             </h1>
             <p class="text-sm mt-1" style="color: var(--text-secondary);">
-                Please review and accept our terms to continue
+                The upstream application requests acceptance of BrightBean’s terms.
             </p>
         </div>
 
@@ -41,7 +38,7 @@
             {% endif %}
 
             <p class="text-sm mb-6" style="color: var(--text-secondary); line-height: 1.6;">
-                One quick step before you get started.
+                This is Cosimo’s self-hosted installation. The agreement below links to BrightBean’s service terms; it has not been accepted.
             </p>
 
             <form method="post">
@@ -67,6 +64,7 @@
             </form>
         </div>
 
+        {% include 'cosimo/source_notice.html' %}
         <!-- Sign out link -->
         <p class="text-center text-sm mt-6" style="color: var(--text-secondary);">
             <a href="{% url 'accounts:logout' %}" class="font-semibold hover:underline" style="color: var(--primary);">Sign out</a>

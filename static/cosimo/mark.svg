@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+<style>
+  .sun { fill: #74418f; } .sat { fill: #4d2b5f; }
+</style>
+<g transform="translate(12.20 8.00) scale(0.840)">
+<circle cx="50" cy="50" r="12.65" class="sun"/>
+<circle cx="62.31" cy="83.83" r="7.09" class="sat"/>
+<circle cx="50.00" cy="86.00" r="6.06" class="sat"/>
+<circle cx="37.69" cy="83.83" r="7.61" class="sat"/>
+<circle cx="26.86" cy="77.58" r="6.58" class="sat"/>
+<circle cx="18.82" cy="68.00" r="5.80" class="sat"/>
+<circle cx="14.55" cy="56.25" r="7.35" class="sat"/>
+<circle cx="14.55" cy="43.75" r="6.32" class="sat"/>
+<circle cx="18.82" cy="32.00" r="6.84" class="sat"/>
+<circle cx="26.86" cy="22.42" r="6.06" class="sat"/>
+<circle cx="37.69" cy="16.17" r="7.61" class="sat"/>
+<circle cx="50.00" cy="14.00" r="6.58" class="sat"/>
+<circle cx="62.31" cy="16.17" r="5.80" class="sat"/>
+</g>
+</svg>

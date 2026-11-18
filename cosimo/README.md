@@ -90,8 +90,12 @@ Mac scheduling depends on Docker running and the Mac remaining awake.
 
 ## Connect LinkedIn
 
-No real LinkedIn account was connected during adoption. Browser access was
-unavailable and no app credentials were found in the marketing configuration.
+The Cosimo Publishing LinkedIn app (266747924) was created on 18 November
+2026 using the existing company page and approved logo. Share on LinkedIn and
+OIDC sign-in are enabled; the callback below is registered and credentials
+are saved in the private runtime configuration. Web and worker were recreated.
+The first-login terms step is complete (observed in the local account record
+and the browser on 18 November). No real LinkedIn profile is connected yet.
 
 Personal posting uses the app's OIDC and Share products, with:
 
@@ -192,3 +196,24 @@ snapshot separately when promoting to remote production.
 There is no second scheduler or inbox in this fork. The custom additions are
 the local deployment, draft bridge, integration check, and transactional fix
 that commits post creation and its replay response together.
+
+## Cosimo interface — 18 November 2026
+
+The local fork now uses the website’s light theme: warm cream, Cosimo purple,
+Space Grotesk body type, EB Garamond headings, IBM Plex Mono labels, and the
+orbital mark. The shared shell, login, page titles and calendar controls are
+branded Cosimo Publishing. The theme lives in `static/cosimo/publishing.css`;
+upstream styles remain separate. Website fonts are bundled with their OFL
+licences. Source/licence attribution remains visible in the application.
+
+This is the AGPL-3.0 self-hosted code, not a signup to BrightBean’s hosted
+service. The upstream first-login service-terms screen links directly to the
+vendor’s terms; that UI is distinct from the software licence. Its wording now
+identifies that distinction. This change did not accept or bypass any terms,
+change posting permissions, or connect/publish to a social account.
+
+Verification: Docker/Tailwind/static-assets build, Django system check and all
+250 templates compiled. The real publishing workspace was inspected in Chrome.
+Further visual checks stopped when the browser switched to Eliot’s meeting;
+no meeting controls were touched. Dark-theme adaptation and deeper workflow
+redesign are not part of this first visual pass.
