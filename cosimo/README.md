@@ -95,7 +95,9 @@ The Cosimo Publishing LinkedIn app (266747924) was created on 18 November
 OIDC sign-in are enabled; the callback below is registered and credentials
 are saved in the private runtime configuration. Web and worker were recreated.
 The first-login terms step is complete (observed in the local account record
-and the browser on 18 November). No real LinkedIn profile is connected yet.
+and the browser on 18 November). Eliot Puplett’s personal profile is now
+connected; the provider’s live profile endpoint independently matched the saved
+identity. The token currently expires on 17 January 2027 at 23:22 UTC.
 
 Personal posting uses the app's OIDC and Share products, with:
 
@@ -128,7 +130,7 @@ node cosimo/content-handoff.mjs prepare \
   --manifest /absolute/path/to/delivery.json \
   --speaker 'Speaker name' --out cosimo/private/bundle.json
 
-node cosimo/content-handoff.mjs import \
+node --dns-result-order=ipv4first cosimo/content-handoff.mjs import \
   --bundle cosimo/private/bundle.json --url http://localhost:4010 \
   --token-file cosimo/private/api-token --account ACCOUNT_UUID \
   --journal cosimo/private/handoff-journal.json
@@ -167,8 +169,13 @@ It uses a disposable workspace against the running service and real PostgreSQL,
 cleans its data, and makes no social platform calls. No end-to-end platform
 tests were run. Browser visual verification was unavailable.
 
-Remaining: OAuth identity/scopes; real-account written/still draft import;
-one specifically approved publication with actual permalink, copy, image and
+Completed since the initial integration check: personal OAuth connection, live
+profile identity verification, and the real-account written/still draft import.
+The requested OAuth scope set is `openid profile email w_member_social`; the
+connection record reports no missing scopes, which is not proof of every
+LinkedIn capability.
+
+Remaining: one specifically approved publication with actual permalink, copy, image and
 timestamp reconciliation; always-on hosting choice; native calendar/history
 migration; comments/analytics capability verification. Selection and local
 installation do not establish that those steps work.
@@ -217,3 +224,59 @@ Verification: Docker/Tailwind/static-assets build, Django system check and all
 Further visual checks stopped when the browser switched to Eliot’s meeting;
 no meeting controls were touched. Dark-theme adaptation and deeper workflow
 redesign are not part of this first visual pass.
+
+
+## Connected account and draft handoff — 18 November 2026
+
+The native OAuth flow returned “Connected Eliot Puplett successfully.” A later
+read-only call to LinkedIn’s profile endpoint confirmed the same name and
+platform ID as the saved account. Account UUID:
+`b31e1e8c-9d30-4307-8462-968d66ba7b9c`.
+
+The three 16 November weekly outputs are imported as unscheduled drafts:
+
+| Source ID | Hub draft ID |
+|---|---|
+| `weekly:2026-11-16:1` | `1d7d7aea-00c4-4577-8fa5-95cd8761f3e0` |
+| `weekly:2026-11-16:2` | `cb1658bd-60fc-41c9-99f6-4c4caf00f376` |
+| `weekly:2026-11-16:3` | `ab28de8a-fbe8-477c-bafa-ce822ff77987` |
+
+Saved captions and original PNG files match their source SHA-256 hashes. All
+three media assets finished processing at 1254×1254. Every platform record
+remains a draft, with no scheduled or published timestamp. Repeating the import
+returned all three existing IDs without creating duplicates. This is a data
+handoff verification, not editorial approval or evidence of public publication.
+
+The private handoff key grants only `create_posts` and `upload_media` for this
+account. Its token and replay journal remain in `cosimo/private/`. The Mac’s
+Node resolver selected IPv6 for `localhost`, while Docker binds IPv4 only;
+use the documented `--dns-result-order=ipv4first` option. The first failed
+connection occurred before any import write.
+
+A private local snapshot of PostgreSQL, media, runtime configuration and the
+handoff files is in `cosimo/private/backups/20261118T232643Z`. Both archive
+indexes were readable. A restore rehearsal and off-machine backup are still
+outstanding. Do not commit or upload this snapshot to the public fork.
+
+### Always-on deployment preparation
+
+The website checkout contains a Railway deployment configuration, and this
+fork includes an upstream `railway.toml` and `render.yaml`. That does not prove
+access to an existing hosting account or spare hosting capacity. No new cloud
+resources or paid plan were created during local setup.
+
+For a remote deployment, reuse the production Django settings, run migrations,
+run web and worker continuously against one PostgreSQL database, and configure
+shared object storage for media. Keep email delivery and hosted Intelligence
+disabled until deliberately configured. Preserve the existing encryption keys
+when migrating the database so stored OAuth tokens remain readable. Disable
+public signup, set the exact allowed HTTPS hostname/CSRF origin, and register
+its LinkedIn callback before switching the content handoff. Keep the local
+instance unscheduled during migration so only one worker owns live publishing.
+
+The upstream Render blueprint’s `plan: free` is not a verified current hosting
+quote. Railway’s current pricing is usage-based; its free plan has sleeping
+services and limited monthly credit. Confirm account access, an agreed spending
+limit, persistent storage and backups before choosing a production deployment.
+References: https://docs.railway.com/pricing and
+https://docs.railway.com/pricing/free-plan.
