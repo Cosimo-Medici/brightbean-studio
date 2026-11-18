@@ -32,6 +32,7 @@ suffix = uuid.uuid4().hex
 trigger = f"cosimo_fail_{suffix}"
 key = f"cosimo-replay-{suffix}"
 org = user = workspace = None
+auto_org_ids = []
 session = requests.Session()
 base = "http://localhost:8000/api/v1"
 
@@ -42,6 +43,7 @@ def call(method, route, expected=200, **kwargs):
 
 try:
     user = get_user_model().objects.create_user(f"verify-{suffix}@localhost")
+    auto_org_ids = list(user.org_memberships.values_list("organization_id", flat=True))
     org = Organization.objects.create(name=f"Verification {suffix}")
     workspace = Workspace.objects.create(organization=org, name="Disposable API verification")
     OrgMembership.objects.create(organization=org, user=user, org_role="owner")
@@ -156,5 +158,6 @@ finally:
         org.delete()
     if user:
         user.delete()
+    Organization.objects.filter(id__in=auto_org_ids).delete()
     session.close()
     print("Temporary verification workspace, account, posts, keys and media removed.")
