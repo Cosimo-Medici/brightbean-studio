@@ -330,12 +330,7 @@ class LinkedInProvider(SocialProvider):
         self._upload_binary(access_token, upload_url, image_source)
 
         # Step 3: create post with image
-        body = self._build_post_body(author, content.text)
-        body["content"] = {
-            "media": {
-                "id": image_urn,
-            }
-        }
+        body = self._build_image_post_body(author, content, image_urn)
 
         resp = self._request(
             "POST",
@@ -350,6 +345,15 @@ class LinkedInProvider(SocialProvider):
             url=self._post_urn_to_url(post_urn),
             extra={"urn": post_urn, "image_urn": image_urn},
         )
+
+    def _build_image_post_body(self, author: str, content: PublishContent, image_urn: str) -> dict:
+        """Keep the saved description in LinkedIn's documented MediaContent field."""
+        body = self._build_post_body(author, content.text)
+        media = {"id": image_urn}
+        if content.media_alt_texts and content.media_alt_texts[0]:
+            media["altText"] = content.media_alt_texts[0]
+        body["content"] = {"media": media}
+        return body
 
     def _publish_video_post(self, access_token: str, author: str, content: PublishContent) -> PublishResult:
         # LinkedIn's Videos REST API: init with fileSizeBytes -> PUT each chunk from

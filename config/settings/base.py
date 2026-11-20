@@ -337,6 +337,9 @@ GOOGLE_AUTH_CLIENT_SECRET = env("GOOGLE_AUTH_CLIENT_SECRET", default="")
 # Unsplash stock-photo search in the composer (optional; empty disables the feature)
 UNSPLASH_ACCESS_KEY = env("UNSPLASH_ACCESS_KEY", default="")
 
+# Register the settings-backed login app only when it can actually authenticate.
+# An empty APP still appears as a Google button in allauth and sends users to
+# Google's "Missing required parameter: client_id" error page.
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "APP": {
@@ -348,6 +351,8 @@ SOCIALACCOUNT_PROVIDERS = {
         "VERIFIED_EMAIL": True,
     },
 }
+if not (GOOGLE_AUTH_CLIENT_ID and GOOGLE_AUTH_CLIENT_SECRET):
+    SOCIALACCOUNT_PROVIDERS["google"].pop("APP")
 
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True

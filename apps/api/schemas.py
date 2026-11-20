@@ -310,6 +310,7 @@ class PostResponse(Schema):
     proposed_publish_at: dt.datetime | None
     status: str  # derived aggregate
     platform_posts: list[PlatformPostSummary]
+    media_asset_ids: list[uuid.UUID] = Field(default_factory=list)
     created_at: dt.datetime
     updated_at: dt.datetime
 
@@ -354,6 +355,7 @@ class PostResponse(Schema):
             proposed_publish_at=post.proposed_publish_at,
             status=post.status,
             platform_posts=platform_posts,
+            media_asset_ids=[attachment.media_asset_id for attachment in post.media_attachments.all()],
             created_at=post.created_at,
             updated_at=post.updated_at,
         )
@@ -764,6 +766,8 @@ class InboxMessageResponse(Schema):
     social_account_id: uuid.UUID
     platform: str
     message_type: str
+    platform_message_id: str = ""
+    parent_message_id: uuid.UUID | None = None
     status: str
     sentiment: str
     sender_name: str
@@ -799,6 +803,8 @@ class InboxMessageResponse(Schema):
             social_account_id=message.social_account_id,
             platform=message.social_account.platform,
             message_type=message.message_type,
+            platform_message_id=message.platform_message_id,
+            parent_message_id=message.parent_message_id,
             status=message.status,
             sentiment=message.sentiment,
             sender_name=message.sender_name,

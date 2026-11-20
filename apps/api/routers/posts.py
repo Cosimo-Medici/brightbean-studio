@@ -124,7 +124,7 @@ def _get_workspace_post(request: HttpRequest, post_id: uuid.UUID) -> Post:
     from django.http import Http404
 
     post = get_object_or_404(
-        Post.objects.prefetch_related("platform_posts__social_account"),
+        Post.objects.prefetch_related("platform_posts__social_account", "media_attachments"),
         id=post_id,
         workspace_id=request.api_key.workspace_id,  # type: ignore[attr-defined]
     )

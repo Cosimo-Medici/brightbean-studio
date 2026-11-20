@@ -47,6 +47,10 @@ services:
 
   worker:
     <<: *app
+    # Production runs in the separate Cosimo Publishing Railway project.
+    # Explicit opt-in prevents a routine local compose up from double-publishing.
+    profiles: [local-publisher]
+    restart: "no"
     command: python manage.py run_studio_worker
     depends_on:
       migrate:

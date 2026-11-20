@@ -8,12 +8,8 @@ from django.utils import timezone
 from .models import PostingSlot, Queue, QueueEntry
 
 # Default posting slots created automatically for newly connected channels.
-DEFAULT_POSTING_SLOTS = {
-    0: [time(9, 24), time(10, 10), time(11, 26), time(12, 42)],  # Monday
-    1: [time(9, 55), time(10, 41), time(11, 57), time(12, 13)],  # Tuesday
-    2: [time(9, 30), time(10, 17), time(11, 32), time(12, 41)],  # Wednesday
-    3: [time(9, 38), time(10, 52)],  # Thursday
-}
+# Cosimo: lunchtime publishing. Slots use the workspace's local timezone.
+DEFAULT_POSTING_SLOTS = {day: [time(12, 15)] for day in range(5)}
 
 
 def create_default_queue_and_slots(social_account):

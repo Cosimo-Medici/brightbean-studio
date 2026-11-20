@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+	</dict>
+	<key>Label</key>
+	<string>work.cosimo.publishing.backup</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/opt/homebrew/bin/python3</string>
+		<string>/Users/eliotpuplett/Documents/Cosimo/cosimo-publishing/cosimo/backup.py</string>
+	</array>
+	<key>StandardErrorPath</key>
+	<string>/Users/eliotpuplett/Documents/Cosimo/cosimo-publishing/cosimo/private/backup-logs/stderr.log</string>
+	<key>StandardOutPath</key>
+	<string>/Users/eliotpuplett/Documents/Cosimo/cosimo-publishing/cosimo/private/backup-logs/stdout.log</string>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>18</integer>
+		<key>Minute</key>
+		<integer>30</integer>
+	</dict>
+	<key>WorkingDirectory</key>
+	<string>/Users/eliotpuplett/Documents/Cosimo/cosimo-publishing</string>
+</dict>
+</plist>

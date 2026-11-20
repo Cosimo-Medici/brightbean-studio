@@ -216,6 +216,8 @@ class PublishContent:
     # the attempt is rescheduled inside the shutdown grace period instead of
     # being killed mid-publish.
     should_stop: Callable[[], bool] | None = None
+    # Resolved per-post descriptions, parallel to media_urls/media_files.
+    media_alt_texts: list[str] = field(default_factory=list)
 
     def is_video(self, index: int = 0) -> bool:
         """Whether media item ``index`` is a video.
