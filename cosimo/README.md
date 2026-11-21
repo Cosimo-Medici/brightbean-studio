@@ -208,6 +208,17 @@ the resulting IDs in an atomic local journal. Repeat imports reuse those IDs;
 changed source versions require editing the existing draft rather than making
 a duplicate. Preserve the journal in backups. Use one journal per hub/account.
 
+Preparation also assigns each pick its planned publishing day: picks in order
+go to Tuesday, Wednesday and Thursday of the delivery week at 12:15 p.m.
+America/New_York (DST-aware). Override the weekday offsets with `--days 1,2,4`
+(0 is Monday). The planned time is stored in the bundle, the draft's internal
+notes and the journal entry. Import still creates drafts only; after Eliot's
+Monday batch approval, schedule each draft natively for its recorded `plannedAt`.
+A replayed import of an existing source ID reuses its draft. A changed source
+version returns `source_changed` for that ID and continues with the others; it
+never overwrites the native draft or creates a second one. Version identity
+uses the text, image and visible fields, not local file paths or planning fields.
+
 An unresolved request older than 23 hours, a changed credential during an
 unresolved import, or a missing saved draft stops the bridge for reconciliation.
 Upstream's replay cache expires after 24 hours. A leftover `.lock` file must be
